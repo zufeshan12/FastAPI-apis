@@ -90,6 +90,7 @@ def sort_result(sortby:str = Query(...,description="sort by height,weight or age
 
     return result
 
+# route to create new patient record
 @app.post("/create")
 def create_patient(patient:Patient):
     data = load_data('patient_data.json')
@@ -107,5 +108,16 @@ def create_patient(patient:Patient):
     # display success message
     return JSONResponse(content="Patient record created successfully.",status_code=200)
 
-    
 
+# route to delete a patient record
+@app.delete('/delete/{patient_id}')
+def delete_patient(patient_id:str):
+    data = load_data("patient_data.json")
+
+    if not patient_id in data:
+        raise HTTPException(status_code=404,detail="Patient record not found")
+    # delete patient
+    del data[patient_id]
+    # save updated file
+    save_data(data)
+    return JSONResponse(content={"message":"Patient record removed successfully."},status_code=200)
